@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Page</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1e1e1e;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+  }
+
+  .container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #333333;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+    margin-top: 100px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .header h2 {
+    margin: 0;
+    padding: 10px 0;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #ffffff;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    background-color: #2c2c2c;
+    color: #ffffff;
+    outline: none;
+    box-sizing: border-box; /* Adjust to include padding and border in width */
+  }
+
+  .form-group input:focus {
+    border-color: #1e90ff;
+  }
+
+  .form-group button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    background-color: #1e90ff;
+    color: #ffffff;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    font-size: 16px;
+  }
+
+  .form-group button:hover {
+    background-color: #0056b3;
+  }
+
+  .error-message {
+    color: #ff0000;
+    margin-top: 10px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h2>Login</h2>
+  </div>
+
+  <form onsubmit="return validateForm()">
+    <div class="form-group">
+      <label for="username">Användarnamn:</label>
+      <input type="text" id="username" name="username" required>
+    </div>
+    <div class="form-group">
+      <label for="password">Lösenord:</label>
+      <input type="password" id="password" name="password" required>
+    </div>
+    <div class="form-group">
+      <button type="submit">Login</button>
+    </div>
+    <div class="error-message" id="error-message" style="display: none;"></div>
+  </form>
+</div>
+
+<script>
+// Load users from users.json file
+fetch('users.json')
+  .then(response => response.json())
+  .then(users => {
+    window.users = users; // Store users globally
+  })
+  .catch(error => console.error('Error loading users:', error));
+
+// Load redirects from redirects.json file
+fetch('redirects.json')
+  .then(response => response.json())
+  .then(redirects => {
+    window.redirects = redirects; // Store redirects globally
+  })
+  .catch(error => console.error('Error loading redirects:', error));
+
+function validateForm() {
+  var username = document.getElementById("username").value;
+  var password = document.getElementById("password").value;
+  var errorMessage = document.getElementById("error-message");
+
+  // Check if the entered username and password match any user's credentials
+  for (var i = 0; i < users.length; i++) {
+    if (users[i].username === username && users[i].password === password) {
+      var role = users[i].role;
+      if (redirects.hasOwnProperty(role)) {
+        window.location.href = redirects[role];
+      } else {
+        errorMessage.textContent = "Något gick fel. Kontakta admin"
+      }
+      return false; // Prevent form submission
+    }
+  }
+
+  // If no matching user is found, display an error message
+  errorMessage.textContent = "Fel användarnamn eller lösenord.";
+  errorMessage.style.display = "block";
+  return false; // Prevent form submission
+}
+</script>
+
+</body>
+</html>
